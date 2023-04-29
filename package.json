@@ -1,0 +1,35 @@
+{
+  "name": "selenajs",
+  "version": "0.0.1",
+  "description": "SelenaJS is an easy-to-use npm package designed to help programmers configure and write tests with Selenium and JavaScript.",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "start": "tsc && node lib/example/index.js",
+    "build": "tsc",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "selenium",
+    "javascript",
+    "test",
+    "automation"
+  ],
+  "author": "anti-duhring <mateus.limavn@gmail.com>",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/anti-duhring/selenajs.git"
+  },
+  "license": "ISC",
+  "devDependencies": {
+    "@types/node": "^18.16.3",
+    "@types/selenium-webdriver": "^4.1.14",
+    "tslib": "^2.5.0",
+    "typescript": "^5.0.4"
+  },
+  "dependencies": {
+    "chalk": "^5.2.0",
+    "enquirer": "^2.3.6",
+    "selenium-webdriver": "^4.9.0"
+  }
+}

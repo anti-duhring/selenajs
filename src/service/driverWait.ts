@@ -1,0 +1,1 @@
+export const driverWait = async(time?: number) => await new Promise(resolve => setTimeout(resolve, time?? 5000));
