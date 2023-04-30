@@ -8,6 +8,9 @@ To use `SelenaJS`, you need to install it through npm. Open a terminal window an
 npm install selenajs
 ```
 
+## Requirements
+To run `SelenaJS` or any Selenium test/automation you may need to install a [driver](https://www.selenium.dev/documentation/webdriver/getting_started/install_drivers/) compatible with your browser to allow it to be automated.
+
 ## Usage
 To use `SelenaJS` in your project, you need to create one or more tests and add them to a `Selena` instance. You can then call the `run()` method to execute the tests in the instance.
 
@@ -61,7 +64,7 @@ Properties that you can pass into `Test` constructor:
 - `category: string`: A category name for grouping the test together with other tests.
 - `config: object`: A custom object to be consumed in your test. You can get this object using the method `Test.getConfig()`.
 - `builder: Builder`: A [Builder](https://www.selenium.dev/selenium/docs/api/javascript/module/selenium-webdriver/index_exports_Builder.html) instance for selenium-webdriver. 
-    - **Ex**: `new Builder().forBrowser('chrome')`. 
+    - **Default**: `new Builder().forBrowser('chrome')`. 
     - **Note**: The builder instance has to be passed without `.build()` method because this method will be automatically called when the test starts running.
 
 Methods that you can use with you `Test` instance:
@@ -82,6 +85,7 @@ Methods that you can use with you `Test` instance:
 - `Test.getLog(): TLog`: Get the log after the test has finished.
 - `Test.getConfig(): object`: Get the config object that has been passed in `Test` constructor.
 - `Test.getCategory(): string`: Get the name of the category of this test.
+- `Test.getName(): string`: Get the name of this test.
 
 ## Running Tests
 To run your tests, you need to create a new instance of `Selena` object. This object provides a `CLI` that makes it easy to manage your tests. You can add all tests inside it using the method `.addAllTests()`.

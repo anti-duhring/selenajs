@@ -7,6 +7,10 @@ enum TypeOfRun {
     allTests = 'All tests',
     specificCategory = 'Specific category'
 }
+enum TypeOfRunByCategory {
+    allTests = 'All tests',
+    specificTest = 'Specific test'
+}
 
 export type TCategory = {
     name: string,
@@ -83,11 +87,36 @@ export class Selena {
         
         const categoryIndex = this.categories.findIndex(c => c.name == category);
 
+        const { typeOfRunByCategory  }: any = await prompt({
+            type: 'select',
+            name: 'typeOfRunByCategory',
+            message: 'Would you like to run all tests in this category or choose a specific test?',
+            choices: [TypeOfRunByCategory.allTests, TypeOfRunByCategory.specificTest]
+        })
+
+        if(typeOfRunByCategory == TypeOfRunByCategory.specificTest) {
+            await this.runSpecificTestFromCategory(categoryIndex)
+            return
+        }
+
         Log.warning(`Running tests from "${category}"...`);
         await this.runAllTests(
             this.categories[categoryIndex].tests, 
             this.categories[categoryIndex].logs
         )
+    }
+
+    private async runSpecificTestFromCategory(categoryIndex: number) {
+        const { test }: any = await prompt({
+            type: 'select',
+            name: 'test',
+            message: 'Choose a test',
+            choices: this.categories[categoryIndex].tests.map(c => c.getName())
+        })
+
+        const testIndex = this.categories[categoryIndex].tests.findIndex(c => c.getName() == test);
+
+        await this.categories[categoryIndex].tests[testIndex].runTest();
     }
 
     private async runAllTests(

@@ -1,6 +1,6 @@
 {
   "name": "selenajs",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "description": "SelenaJS is an easy-to-use npm package designed to help programmers configure and write tests with Selenium and JavaScript.",
   "main": "lib/index.js",
   "type": "module",

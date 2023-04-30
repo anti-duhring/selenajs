@@ -14,5 +14,6 @@ export declare class Selena {
     getLogs(): TLog[];
     run(): void;
     private runByCategory;
+    private runSpecificTestFromCategory;
     private runAllTests;
 }

@@ -114,4 +114,8 @@ export class Test {
     getCategory() {
         return this.category;
     }
+
+    getName() {
+        return this.name;
+    }
 }

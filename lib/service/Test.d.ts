@@ -30,4 +30,5 @@ export declare class Test {
     getLog(): TLog;
     getConfig(): object;
     getCategory(): string;
+    getName(): string;
 }
