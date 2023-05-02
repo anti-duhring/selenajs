@@ -1,9 +1,10 @@
-import { Builder, WebDriver } from 'selenium-webdriver';
+import { Builder } from 'selenium-webdriver';
+import { SelenaDriver } from "./SelenaDriver.js";
 export type TLog = {
     name: string;
     category: string;
     message: string | null | undefined;
-    status: "passed" | "failed" | "progress";
+    status: StatusTest.progress | StatusTest.passed | StatusTest.failed;
 };
 export type TProps = {
     name: string;
@@ -13,7 +14,12 @@ export type TProps = {
 };
 export type TPassTest = () => void;
 export type TFailTest = (message: string) => void;
-export type TTestFunction = (driver: WebDriver, passed: TPassTest, failed: TFailTest) => Promise<any>;
+export type TTestFunction = (driver: SelenaDriver, passed: TPassTest, failed: TFailTest) => Promise<any>;
+export declare enum StatusTest {
+    passed = 0,
+    failed = 1,
+    progress = 2
+}
 export declare class Test {
     private readonly config;
     private readonly name;
@@ -27,6 +33,7 @@ export declare class Test {
     private passed;
     private failed;
     private createDefaultBuilder;
+    private resetLog;
     getLog(): TLog;
     getConfig(): object;
     getCategory(): string;

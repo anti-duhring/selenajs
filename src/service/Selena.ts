@@ -1,5 +1,5 @@
 import Log from "./Log.js";
-import { TLog, Test } from "./Test.js";
+import { StatusTest, TLog, Test } from "./Test.js";
 import enquirer from 'enquirer';
 const { prompt } = enquirer;
 
@@ -131,7 +131,7 @@ export class Selena {
             }
         
             const { passedTests, failedTests } = logs.reduce((acc, log) => {
-            if (log.status === 'passed') {
+            if (log.status === StatusTest.passed) {
                 acc.passedTests.push(log);
             } else {
                 acc.failedTests.push(log);
