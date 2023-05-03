@@ -11,12 +11,16 @@ testFromAnotherCategoryExample.createTest(async (driver, passed, failed) => {
 
     const searchBox = await driver.waitUntilFind(
         By.css('textarea[name="q"]'),
-        500
+        1000
     )
 
     searchBox.sendKeys('selenajs')
 
-    await driverWait()
+    await driver.waitUntilFindAndClick(
+        By.css('img[alt="Google"]')
+    )
+    
+    await driver.sleep(5000)
 })
 
 export default testFromAnotherCategoryExample

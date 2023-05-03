@@ -1,31 +1,13 @@
 import Log from "./Log.js"
 import { Builder, Locator, WebDriver, until } from 'selenium-webdriver'
 import chrome from 'selenium-webdriver/chrome.js';
-import { SelenaDriver, SelenaDriverImpl } from "./SelenaDriver.js";
-
-export type TLog = {
-    name: string,
-    category: string,
-    message: string | null | undefined,
-    status: StatusTest.progress | StatusTest.passed | StatusTest.failed,
-}
-
-export type TProps = { 
-    name: string, 
-    category?: string,
-    builder?: Builder,
-    config?: object, 
-}
-
-export type TPassTest = () => void
-export type TFailTest = (message: string) => void
-
-export type TTestFunction = (driver: SelenaDriver, passed: TPassTest, failed: TFailTest) => Promise<any>
+import { SelenaDriverImpl } from "./SelenaDriver.js";
+import { TLog, TProps, TTestFunction } from "../@types/Test.js";
 
 export enum StatusTest {
-    passed,
-    failed,
-    progress
+    passed = 'passed',
+    failed = 'failed',
+    progress = 'progress'
 }
 
 export class Test {
@@ -76,9 +58,9 @@ export class Test {
                 this.failed.bind(this)
             )
 
-            this.passed.bind(this)()
+            this.passed()
         } catch(err) {
-            Log.error(err.message)
+            this.failed(err.message)
         } finally {
             driver.close()
         }
@@ -97,7 +79,7 @@ export class Test {
     }
     
     private failed(message: string) {
-        if(this.log.status == StatusTest.passed) return
+        if(this.log.status != StatusTest.progress) return
         
         const log: TLog = {
             ...this.log,
@@ -106,7 +88,7 @@ export class Test {
         }
 
         this.log = log
-        throw new Error(`Test "${this.name}" failed. \nReason: ${message}`)
+        Log.error(`Test "${this.name}" failed. \nReason: ${message}`)
     }
 
     private createDefaultBuilder() {

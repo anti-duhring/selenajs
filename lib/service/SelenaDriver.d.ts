@@ -1,9 +1,7 @@
-import { Builder, Locator, WebDriver, WebElement } from "selenium-webdriver";
+import { Builder } from "selenium-webdriver";
+import { SelenaDriver } from "../@types/SelenaDriver.js";
 export declare class SelenaDriverImpl {
     private builder;
     constructor(builder: Builder);
     createDriver(): Promise<SelenaDriver>;
-}
-export interface SelenaDriver extends WebDriver {
-    waitUntilFind(locator: Locator): Promise<WebElement>;
 }
