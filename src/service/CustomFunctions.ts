@@ -1,8 +1,7 @@
 import { Locator, WebElement, until } from "selenium-webdriver"
 import { execSync } from "child_process"
 import os from 'os'
-import { existsSync, mkdirSync } from "fs"
-import path from "path"
+import { existsSync, promises } from "fs"
 
 async function waitUntilFind(
     locator: Locator, 
@@ -35,23 +34,63 @@ async function waitUntilFindAndClick(
     return element as WebElement
 }
 
-async function waitUntilDownloadComplete(
-    downloadDir: string,
-    filename: string,
-    timeout: number = 10000
+async function waitUntilFindAndSendKeys(
+    locator: Locator,
+    keys: string,
+    timeout: number = 1000
 ) {
-    if (!existsSync(downloadDir)) {
-        mkdirSync(downloadDir, { recursive: true });
+    const element: WebElement = await this.wait(
+        until.elementLocated(locator),
+        timeout
+    )
+
+    await this.wait(
+        until.elementIsEnabled(element),
+        timeout
+    )
+
+    await element.sendKeys(keys)
+
+    return element
+}
+
+async function waitUntilDownloadComplete(
+    fileName: string, 
+    downloadDir = `${os.homedir}\\Downloads`, 
+    timeout = 10000
+) {
+    let elapsedTime = new Date();
+
+    async function waitForFileToDownload(
+      callbackWhenCompleted: (isError: boolean) => void,
+    ) {
+      if (!existsSync(downloadDir)) await promises.mkdir(downloadDir, { recursive: true });
+      const downloadPath = `${downloadDir.replace(/\\/g,'/')}/${fileName}`;
+  
+      const now = new Date();
+
+      // Reference: https://stackoverflow.com/a/13894670
+      
+      const hasPassedTimeout = (now.getTime() - elapsedTime.getTime()) / 1000 > timeout;
+      if (hasPassedTimeout) callbackWhenCompleted(true);
+      else if (existsSync(downloadPath)) callbackWhenCompleted(false);
+      
+      // Reference: https://nodejs.org/en/docs/guides/event-loop-timers-and-nexttick
+
+      else process.nextTick(() => waitForFileToDownload(callbackWhenCompleted));
     }
-
-    const downloadPath = os.platform() === 'win32' ? downloadDir : path.join(downloadDir, filename);
-
-    await this.wait(async function() {
-        return existsSync(downloadPath);
-    }, timeout);
+  
+    return new Promise((resolve, reject) => {
+      void waitForFileToDownload.bind(this)((isError) => {
+        if (isError) reject({ message: 'Download timeout has been reached' });
+        else resolve(undefined);
+      });
+    });
 }
 
 export {
     waitUntilFind,
-    waitUntilFindAndClick
+    waitUntilFindAndClick,
+    waitUntilFindAndSendKeys,
+    waitUntilDownloadComplete
 }
