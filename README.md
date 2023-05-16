@@ -2,6 +2,15 @@
 
 `SelenaJS` is a lightweight testing framework for Node.js, designed to simplify the creation and execution of end-to-end tests. With `SelenaJS`, you can easily define and organize your tests, and execute them in a reliable and repeatable way.
 
+## Index
+- [Installation](#installation)
+- [Requirements](#requirements)
+- [Usage](#usage)
+    - [Creating tests](#creating-tests)
+    - [Running tests](#running-tests)
+- [Test Function](#test-function)
+- [SelenaDriver](#selenadriver)
+
 ## Installation
 To use `SelenaJS`, you need to install it through npm. Open a terminal window and type:
 ```bash
@@ -43,7 +52,7 @@ In this example, we create a new `Test` object and give it a name and category. 
 We then create a Selena instance and add the test to it using the `addAllTests()` method. Finally, we call `run()` to execute all the tests in the instance.
 
 ## Creating Tests
-To create a new test in Selena, you need to create a new `Test` object and give it a name and category. You can then define a test function that uses a Selenium WebDriver instance to perform one or more actions, and call the `passed()` or `failed()` methods to indicate whether the test has passed or failed.
+To create a new test in Selena, you need to create a new `Test` object and give it a name and category. You can then define a test function that uses a SelenaDriver instance to perform one or more actions, and call the `passed()` or `failed()` methods to indicate whether the test has passed or failed.
 
 Here's an example of how to create a new test in Selena:
 ```javascript
@@ -53,7 +62,7 @@ const test = new Test({
 });
 
 test.createTest(async (driver, passed, failed) => {
-    // Use the Selenium WebDriver instance to perform actions here
+    // Use the SelenaDriver instance to perform actions here
     // Call passed() if the test passes, or failed() if it fails
     // If failed() is not called, the test will be considered passed
 });
@@ -81,6 +90,7 @@ Methods that you can use with you `Test` instance:
         }
     });
     ```
+    - This method receive an async function as parameter, which is exaplained in details down below, on the topic about [`Test Function`](#test-function).
 - `Test.runTest(): Promise<TLog>`: This method can be used to run this single test.
 - `Test.getLog(): TLog`: Get the log after the test has finished.
 - `Test.getConfig(): object`: Get the config object that has been passed in `Test` constructor.
@@ -122,6 +132,104 @@ Methods that you can use with you `Selena` instance:
 - `Selena.run(): void`: Initiate your tests, providing a `CLI`.
 
 Using `SelenaJS`, you can streamline your testing process by running multiple tests at once and quickly identifying which tests have passed or failed. The report provided by Selena helps you to pinpoint any issues or bugs in your code and make necessary changes to improve your software's functionality.
+
+## Test Function
+The `Test Function` is an async function passed as a parameter of the `Test.createTest()` method, and it is inside that function where your test has to be. Ex:
+```javascript
+const testFunction = async (driver, passed, failed) => {
+    await driver.get("https://www.google.com");
+    const title = await driver.getTitle();
+    if (title === "Google") {
+        passed();
+    } else {
+        failed(`Unexpected title: ${title}`);
+    }
+}
+test.createTest(testFunction)
+```
+
+This function receive three parameters, a `driver`, which is a [`SelenaDriver`](#selenadriver) instance, the `passed` function, which you can call when the test pass and a `failed` function, which you can call when the test has to fail.
+
+- `Test.passed(): void`: A function to be called when you want you test to be consider as passed. If this function is never called the test will automatically be considered passed if the function `failed` is not called.
+- `Test.failed(message: string): void`: A function to be called when you want you test to be consider as failed. If the `passed` function already has been called the test will not be considered failed even if the `failed` function is called after.
+
+## SelenaDriver
+The `SelenaDriver` is an instance of a [`Selenium WebDriver`](https://www.selenium.dev/documentation/webdriver/) with some custom functions:
+
+- `SelenaDriver.waitUntilFind(locator: Locator, timeout?: number): Promise<WebElement>`
+    - This method is a shortcut to the method that waits until an element is located. Ex:
+    ```javascript
+    // This method
+    const element = await driver.wait(
+        until.elementLocated(By.css('button')),
+        1000
+    )
+
+    // Can be used like this
+    const element = await driver.waitUntilFind(
+        By.css('button'),
+        1000
+    )
+    ```
+- `SelenaDriver.waitUntilFindAndClick(locator: Locator, timeout?: number): Promise<WebElement>`
+    - This method is a shortcut to the method that waits until an element is located and then clicks on it. Ex:
+    ```javascript
+    // This method
+    const element = await driver.wait(
+        until.elementLocated(By.css('button')),
+        1000
+    )
+
+    await driver.wait(
+        until.elementIsEnabled(element),
+        1000
+    )
+
+    await element.click()
+
+    // Can be used like this
+    const element = await driver.waitUntilFindAndClick(
+        By.css('button'),
+        1000
+    )
+    ```
+- `SelenaDriver.waitUntilFindAndSendKeys(locator: Locator, keys: string, timeout?: number): Promise<WebElement>`
+    - This method is a shortcut to the method that waits until an element is located and then sends keys on it. Ex:
+    ```javascript
+    // This method
+    const element = await driver.wait(
+        until.elementLocated(By.css('input')),
+        1000
+    )
+
+    await driver.wait(
+        until.elementIsEnabled(element),
+        until
+    )
+
+    await element.sendKeys('Some text')
+
+    // Can be used like this
+    const element = await driver.waitUntilFindAndSendKeys(
+        By.css('input'),
+        'Some text',
+        1000
+    )
+    ```
+
+- `SelenaDriver.waitUntilDownloadComplete(fileName: string, downloadDir?: string, timeout?: number): Promise<unknown>`
+    - This method waits until a file is downloaded and then, when it's finished, keeps performing all remaining actions. Ex:
+    ```javascript
+    await driver.waitUntilFindAndClick(
+        By.css('button')
+    )
+
+    await driver.waitUntilDownloadComplete('file.zip')
+
+    await driver.get('https://google.com')
+    ```
+
+    In this example the driver click on a button that downloads the file, waits until the download complete and then, when it's finished, go to the Google homepage.
 
 # Contributing
 Thank you for considering contributing to `SelenaJS`! We welcome any contributions, whether they be bug fixes, feature requests, documentation improvements, or anything in between.
