@@ -1,9 +1,5 @@
-import { TLog, Test } from "./Test.js";
-export type TCategory = {
-    name: string;
-    tests: Test[];
-    logs: TLog[];
-};
+import { TLog } from "../@types/Test.js";
+import { Test } from "./Test.js";
 export declare class Selena {
     private readonly logs;
     private allTests;

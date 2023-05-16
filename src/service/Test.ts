@@ -1,32 +1,26 @@
 import Log from "./Log.js"
-import { Builder, WebDriver } from 'selenium-webdriver'
+import { Builder, Locator, WebDriver, until } from 'selenium-webdriver'
 import chrome from 'selenium-webdriver/chrome.js';
+import { SelenaDriverImpl } from "./SelenaDriver.js";
+import { TLog, TProps, TTestFunction } from "../@types/Test.js";
 
-export type TLog = {
-    name: string,
-    category: string,
-    message: string | null | undefined,
-    status: "passed" | "failed" | "progress"
+export enum StatusTest {
+    passed = 'passed',
+    failed = 'failed',
+    progress = 'progress'
 }
-
-export type TProps = { 
-    name: string, 
-    category?: string,
-    builder?: Builder,
-    config?: object, 
-}
-
-export type TPassTest = () => void
-export type TFailTest = (message: string) => void
-
-export type TTestFunction = (driver: WebDriver, passed: TPassTest, failed: TFailTest) => Promise<any>
 
 export class Test {
     private readonly config: object = {};
     private readonly name: string;
     private readonly category: string;
 
-    private log: TLog;
+    private log: TLog = {
+        name: null,
+        category: null,
+        message: null,
+        status: StatusTest.progress,
+    };
     private testFunction?: TTestFunction;
 
     private builder: Builder;
@@ -39,10 +33,9 @@ export class Test {
         this.builder = props.builder ?? this.createDefaultBuilder();
 
         this.log = {
+            ...this.log,
             name: props.name,
             category: props.category ?? this.name,
-            message: null,
-            status: "progress"
         }
     }
 
@@ -51,24 +44,25 @@ export class Test {
     }
 
     async runTest() {
-        if(this.testFunction) {
-            Log.warning(`Loading test "${this.name}"...`);
-            const driver = await this.builder.build();
+        if(!this.testFunction) return 
 
-            try {
-                await this.testFunction(
-                    driver,
-                    this.passed.bind(this), 
-                    this.failed.bind(this)
-                );
+        this.resetLog()
 
-                this.passed.bind(this)()
-            } catch(err) {
-                Log.error(err.message)
-            } finally {
-                driver.close()
-            }
-             
+        Log.warning(`Loading test "${this.name}"...`)
+        const driver = await new SelenaDriverImpl(this.builder).createDriver();
+
+        try {
+            await this.testFunction(
+                driver,
+                this.passed.bind(this), 
+                this.failed.bind(this)
+            )
+
+            this.passed()
+        } catch(err) {
+            this.failed(err.message)
+        } finally {
+            driver.close()
         }
 
         return this.log
@@ -76,8 +70,8 @@ export class Test {
 
     private passed() {
         const log: TLog = {
-            ...this.getLog(),
-            status: 'passed',
+            ...this.log,
+            status: StatusTest.passed,
         }
 
         this.log = log
@@ -85,14 +79,16 @@ export class Test {
     }
     
     private failed(message: string) {
+        if(this.log.status != StatusTest.progress) return
+        
         const log: TLog = {
-            ...this.getLog(),
-            status: 'failed',
+            ...this.log,
+            status: StatusTest.failed,
             message
         }
 
         this.log = log
-        throw new Error(`Test "${this.name}" failed. \nReason: ${message}`)
+        Log.error(`Test "${this.name}" failed. \nReason: ${message}`)
     }
 
     private createDefaultBuilder() {
@@ -101,6 +97,14 @@ export class Test {
 
 
         return new Builder().forBrowser('chrome').withCapabilities(options);
+    }
+
+    private resetLog() {
+        this.log = {
+            ...this.getLog(),
+            status: StatusTest.progress,
+            message: null
+        }
     }
 
     getLog() {

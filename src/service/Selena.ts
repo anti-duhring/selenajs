@@ -1,5 +1,7 @@
+import { TCategory } from "../@types/Selena.js";
+import { TLog } from "../@types/Test.js";
 import Log from "./Log.js";
-import { TLog, Test } from "./Test.js";
+import { StatusTest, Test } from "./Test.js";
 import enquirer from 'enquirer';
 const { prompt } = enquirer;
 
@@ -11,13 +13,6 @@ enum TypeOfRunByCategory {
     allTests = 'All tests',
     specificTest = 'Specific test'
 }
-
-export type TCategory = {
-    name: string,
-    tests: Test[],
-    logs: TLog[]
-}
-
 export class Selena {
     private readonly logs: TLog[] = [];
     private allTests: Test[] = [];
@@ -56,7 +51,7 @@ export class Selena {
 
     run() {
         Log.warning(`Starting Selena...`)
-        Log.warning(`${this.categories.length} categories found`)
+        Log.warning(`${this.categories.length} categories were found`)
         Log.warning(`${this.allTests.length} tests found in these categories`)
 
         const typeOfRun = prompt({
@@ -131,7 +126,7 @@ export class Selena {
             }
         
             const { passedTests, failedTests } = logs.reduce((acc, log) => {
-            if (log.status === 'passed') {
+            if (log.status === StatusTest.passed) {
                 acc.passedTests.push(log);
             } else {
                 acc.failedTests.push(log);

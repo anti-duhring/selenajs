@@ -1,19 +1,9 @@
-import { Builder, WebDriver } from 'selenium-webdriver';
-export type TLog = {
-    name: string;
-    category: string;
-    message: string | null | undefined;
-    status: "passed" | "failed" | "progress";
-};
-export type TProps = {
-    name: string;
-    category?: string;
-    builder?: Builder;
-    config?: object;
-};
-export type TPassTest = () => void;
-export type TFailTest = (message: string) => void;
-export type TTestFunction = (driver: WebDriver, passed: TPassTest, failed: TFailTest) => Promise<any>;
+import { TLog, TProps, TTestFunction } from "../@types/Test.js";
+export declare enum StatusTest {
+    passed = "passed",
+    failed = "failed",
+    progress = "progress"
+}
 export declare class Test {
     private readonly config;
     private readonly name;
@@ -27,6 +17,7 @@ export declare class Test {
     private passed;
     private failed;
     private createDefaultBuilder;
+    private resetLog;
     getLog(): TLog;
     getConfig(): object;
     getCategory(): string;

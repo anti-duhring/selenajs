@@ -1,3 +1,4 @@
+import { By, until } from "selenium-webdriver";
 import { Test, driverWait } from "../index.js"; 
 
 const testFromAnotherCategoryExample = new Test({
@@ -8,7 +9,18 @@ const testFromAnotherCategoryExample = new Test({
 testFromAnotherCategoryExample.createTest(async (driver, passed, failed) => {
     await driver.get('https://www.google.com')
 
-    await driverWait()
+    const searchBox = await driver.waitUntilFind(
+        By.css('textarea[name="q"]'),
+        1000
+    )
+
+    searchBox.sendKeys('selenajs')
+
+    await driver.waitUntilFindAndClick(
+        By.css('img[alt="Google"]')
+    )
+    
+    await driver.sleep(5000)
 })
 
 export default testFromAnotherCategoryExample
