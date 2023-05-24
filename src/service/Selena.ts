@@ -1,7 +1,5 @@
-import { TCategory } from "../@types/Selena.js";
-import { TLog } from "../@types/Test.js";
 import Log from "./Log.js";
-import { StatusTest, Test } from "./Test.js";
+import { StatusTest, TLog, Test } from "./Test.js";
 import enquirer from 'enquirer';
 const { prompt } = enquirer;
 
@@ -13,6 +11,13 @@ enum TypeOfRunByCategory {
     allTests = 'All tests',
     specificTest = 'Specific test'
 }
+
+export type TCategory = {
+    name: string,
+    tests: Test[],
+    logs: TLog[]
+}
+
 export class Selena {
     private readonly logs: TLog[] = [];
     private allTests: Test[] = [];

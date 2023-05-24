@@ -1,14 +1,32 @@
 import Log from "./Log.js"
 import { Builder, Locator, WebDriver, until } from 'selenium-webdriver'
 import chrome from 'selenium-webdriver/chrome.js';
-import { SelenaDriverImpl } from "./SelenaDriver.js";
-import { TLog, TProps, TTestFunction } from "../@types/Test.js";
+import { SelenaDriver, SelenaDriverImpl } from "./SelenaDriver.js";
 
 export enum StatusTest {
     passed = 'passed',
     failed = 'failed',
     progress = 'progress'
 }
+
+export type TLog = {
+    name: string,
+    category: string,
+    message: string | null | undefined,
+    status: StatusTest.progress | StatusTest.passed | StatusTest.failed,
+}
+
+export type TProps = { 
+    name: string, 
+    category?: string,
+    builder?: Builder,
+    config?: object, 
+}
+
+export type TPassTest = () => void
+export type TFailTest = (message: string) => void
+
+export type TTestFunction = (driver: SelenaDriver, passed: TPassTest, failed: TFailTest) => Promise<any>
 
 export class Test {
     private readonly config: object = {};

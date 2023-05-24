@@ -1,5 +1,5 @@
-import { Test } from "../service/Test.js"
-import { TLog } from "./Test"
+import type { Test } from "../service/Test"
+import type { TLog } from "./Test"
 
 export type TCategory = {
     name: string,
