@@ -1,6 +1,5 @@
 import { Builder, Locator, WebDriver, WebElement, until } from "selenium-webdriver";
 import { waitUntilDownloadComplete, waitUntilFind, waitUntilFindAndClick, waitUntilFindAndSendKeys } from "./CustomFunctions.js";
-import { SelenaDriver } from "../@types/SelenaDriver.js";
 
 export class SelenaDriverImpl {
     private builder: Builder;
@@ -18,4 +17,15 @@ export class SelenaDriverImpl {
 
         return driver;
     }
+}
+
+export interface SelenaDriver extends WebDriver
+{
+    waitUntilFind(locator: Locator, time?: number): Promise<WebElement>
+
+    waitUntilFindAndClick(locator: Locator, time?: number): Promise<WebElement>
+
+    waitUntilFindAndSendKeys(locator: Locator, keys: string, time?: number): Promise<void>
+
+    waitUntilDownloadComplete( filename:  string, downloadDir?: string, timeout?: number): Promise<void>
 }

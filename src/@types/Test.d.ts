@@ -1,6 +1,6 @@
 import { Builder } from "selenium-webdriver"
-import { StatusTest } from "../service/Test.js"
-import { SelenaDriver } from "./SelenaDriver.js"
+import type { StatusTest } from "../service/Test"
+import type { SelenaDriver } from "./SelenaDriver"
 
 export type TLog = {
     name: string,
